@@ -1,11 +1,11 @@
 // Verifica se o usuário está autenticado
-const isLoggedIn = sessionStorage.getItem("isLoggedIn");
-if (!isLoggedIn) {
+if (sessionStorage.getItem("isLoggedIn") !== "true") {
   window.location.href = "login.html";
 }
 
 let selectedImage = null;
 let imageType = "upload";
+let editIndex = null; // Índice do produto sendo editado
 
 // Alterna entre upload e URL
 document.getElementById("image-type").addEventListener("change", function() {
@@ -57,8 +57,7 @@ function loadProducts() {
       <div class="product-image">
         ${product.image 
           ? `<img src="${product.image}" alt="${product.name}">` 
-          : `<i class="fas fa-wine-bottle" style="font-size: 3rem;"></i>`
-        }
+          : `<i class="fas fa-wine-bottle" style="font-size: 3rem;"></i>`}
       </div>
       <div class="product-info">
         <h3 class="product-name">${product.name}</h3>
@@ -75,7 +74,7 @@ function loadProducts() {
   });
 
   document.querySelectorAll('.edit-product').forEach(btn => {
-    btn.addEventListener('click', () => editProduct(btn.dataset.index));
+    btn.addEventListener('click', () => startEditProduct(btn.dataset.index));
   });
   document.querySelectorAll('.delete-product').forEach(btn => {
     btn.addEventListener('click', () => deleteProduct(btn.dataset.index));
@@ -93,19 +92,14 @@ function getCategoryName(categoryValue) {
   return categories[categoryValue] || categoryValue;
 }
 
-document.getElementById('product-form').addEventListener('submit', function(e) {
+// Submit do formulário (adicionar ou salvar edição)
+document.getElementById('product-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  let finalImage = null;
-  if (imageType === "upload") {
-    finalImage = selectedImage;
-  } else {
-    finalImage = document.getElementById("product-image-url").value.trim() || null;
-  }
+  let finalImage = imageType === "upload" ? selectedImage : document.getElementById("product-image-url").value.trim() || null;
 
   if (!finalImage) {
-    showAlert('Por favor, insira uma imagem (upload ou link).', 'danger');
-    return;
+    return Swal.fire('Erro', 'Por favor, insira uma imagem (upload ou link).', 'error');
   }
 
   const product = {
@@ -117,28 +111,37 @@ document.getElementById('product-form').addEventListener('submit', function(e) {
   };
 
   if (parseFloat(product.price) <= 0) {
-    showAlert('Por favor, insira um preço válido.', 'danger');
-    return;
+    return Swal.fire('Erro', 'Por favor, insira um preço válido.', 'error');
   }
   
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
-  products.push(product);
+
+  if (editIndex !== null) {
+    // Atualiza produto existente
+    products[editIndex] = product;
+    Swal.fire('Sucesso', 'Produto atualizado com sucesso!', 'success');
+    editIndex = null;
+    document.querySelector('#product-form button').textContent = 'Adicionar Produto';
+  } else {
+    // Adiciona novo produto
+    products.push(product);
+    Swal.fire('Sucesso', 'Produto adicionado com sucesso!', 'success');
+  }
+
   localStorage.setItem('garrafeira-products', JSON.stringify(products));
-  
   loadProducts();
   this.reset();
   document.getElementById("image-type").value = "upload";
   document.getElementById("upload-group").style.display = "block";
   document.getElementById("url-group").style.display = "none";
   selectedImage = null;
-
-  showAlert('Produto adicionado com sucesso!', 'success');
 });
 
-function editProduct(index) {
+// Iniciar edição
+function startEditProduct(index) {
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
   const product = products[index];
-  
+
   document.getElementById('product-name').value = product.name;
   document.getElementById('product-price').value = product.price;
   document.getElementById('product-category').value = product.category;
@@ -156,34 +159,38 @@ function editProduct(index) {
     document.getElementById("url-group").style.display = "none";
     selectedImage = product.image || null;
   }
-  
-  products.splice(index, 1);
-  localStorage.setItem('garrafeira-products', JSON.stringify(products));
-  
-  loadProducts();
-  showAlert('Produto carregado para edição.', 'success');
+
+  editIndex = index;
+  document.querySelector('#product-form button').textContent = 'Salvar Alterações';
+  Swal.fire('Editando', 'Edite o produto e clique em "Salvar Alterações".', 'info');
 }
 
+// Deletar produto
 function deleteProduct(index) {
-  if (confirm('Tem certeza que deseja excluir este produto?')) {
-    const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
-    products.splice(index, 1);
-    localStorage.setItem('garrafeira-products', JSON.stringify(products));
-    loadProducts();
-    showAlert('Produto excluído com sucesso!', 'success');
-  }
+  Swal.fire({
+    title: 'Tem certeza?',
+    text: "Deseja realmente excluir este produto?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sim, excluir!',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
+      products.splice(index, 1);
+      localStorage.setItem('garrafeira-products', JSON.stringify(products));
+      loadProducts();
+      Swal.fire('Excluído!', 'Produto excluído com sucesso.', 'success');
+    }
+  });
 }
-
-function showAlert(message, type) {
-  const alertDiv = document.getElementById('form-alert');
-  alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-  setTimeout(() => alertDiv.innerHTML = '', 5000);
-}
-
-document.addEventListener('DOMContentLoaded', loadProducts);
 
 // Logout
 document.getElementById("logout-btn").addEventListener("click", () => {
   sessionStorage.removeItem("isLoggedIn");
   window.location.href = "login.html";
 });
+
+document.addEventListener('DOMContentLoaded', loadProducts);
