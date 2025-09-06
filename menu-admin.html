@@ -89,7 +89,7 @@
           <button type="submit" class="btn btn-primary">Adicionar Produto</button>
         </form>
 
-        <hr style="margin: 30px 0; border-color: #e5e7eb;">
+        <hr>
 
         <h2>Produtos Cadastrados</h2>
         <div class="products-grid" id="products-list"></div>
@@ -107,6 +107,40 @@
         <p>Em desenvolvimento...</p>
       </div>
     </main>
+
+    <!-- Modal de Edição -->
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Editar Produto</h2>
+        <form id="edit-product-form">
+          <div class="form-group">
+            <label for="edit-name">Nome</label>
+            <input type="text" id="edit-name" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-price">Preço (Kz)</label>
+            <input type="number" id="edit-price" class="form-control" min="0" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-category">Categoria</label>
+            <select id="edit-category" class="form-control" required>
+              <option value="vinhos">Vinhos</option>
+              <option value="destilados">Destilados</option>
+              <option value="cervejas">Cervejas</option>
+              <option value="aperitivos">Aperitivos</option>
+              <option value="promocoes">Promoções</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-description">Descrição</label>
+            <textarea id="edit-description" class="form-control" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <!-- JS -->
