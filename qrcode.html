@@ -16,13 +16,11 @@
       height: 100vh;
       margin: 0;
     }
-
     h1 {
       color: #800000;
       margin-bottom: 20px;
       text-align: center;
     }
-
     .qr-box {
       background: #fff;
       padding: 20px;
@@ -30,11 +28,9 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
     }
-
     canvas {
       margin-top: 10px;
     }
-
     .download-btn {
       display: inline-block;
       margin-top: 15px;
@@ -46,11 +42,9 @@
       font-size: 16px;
       transition: background 0.3s ease;
     }
-
     .download-btn:hover {
       background: #a00000;
     }
-
     p {
       margin-top: 10px;
       color: #555;
@@ -66,46 +60,45 @@
   </div>
 
   <script>
-   const menuLink = "https://sebastianakranhele.github.io/menu-digital/index.html"; // 👉 link do menu digital
+    const menuLink = "https://sebastianakranhele.github.io/menu-digital/index.html";
     const canvas = document.getElementById("qrcode");
+    const downloadLink = document.getElementById("download-link");
 
     // gera o QR Code
     QRCode.toCanvas(canvas, menuLink, {
       width: 300,
-      color: {
-        dark: "#800000",
-        light: "#ffffff"
-      }
+      errorCorrectionLevel: 'H',
+      color: { dark: "#800000", light: "#ffffff" }
     }, function (error) {
       if (error) console.error(error);
-      else {
-        console.log("✅ QR Code gerado!");
-        addLogoToQR();
-      }
+      else addLogoToQR(); // tenta adicionar a logo
+      // garante que o botão de download está ativo desde o início
+      downloadLink.href = canvas.toDataURL("image/png");
     });
 
     function addLogoToQR() {
       const ctx = canvas.getContext("2d");
-
-      // carrega a logo (coloca a tua imagem em assets/img/logo.png)
       const logo = new Image();
-      logo.src = "assets/img/logo.png"; // 👉 muda para o caminho correto da tua logo
+      logo.crossOrigin = "anonymous"; // evita problemas de CORS
+      logo.src = "https://sebastianakranhele.github.io/menu-digital/assets/img/logo.png";
+
       logo.onload = function () {
-        const logoSize = 70; // tamanho da logo no centro
+        const logoSize = 70;
         const x = (canvas.width - logoSize) / 2;
         const y = (canvas.height - logoSize) / 2;
 
-        ctx.fillStyle = "white"; // fundo branco atrás da logo
+        ctx.fillStyle = "white";
         ctx.fillRect(x - 8, y - 8, logoSize + 16, logoSize + 16);
-
         ctx.drawImage(logo, x, y, logoSize, logoSize);
 
-        // botão de download atualizado com logo aplicada
-        const downloadLink = document.getElementById("download-link");
+        // atualiza o download com a versão final (QR + logo)
         downloadLink.href = canvas.toDataURL("image/png");
+      };
+
+      logo.onerror = function () {
+        console.warn("⚠️ Logo não carregou. QR Code ainda pode ser baixado sem a logo.");
       };
     }
   </script>
 </body>
 </html>
-
