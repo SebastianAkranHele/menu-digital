@@ -11,9 +11,10 @@
 </head>
 <body>
   <div class="app-container">
+    <!-- Header -->
     <header class="header">
       <div class="header-content">
-        <a href="index.html" class="back-btn">
+        <a href="index.html" class="back-btn" aria-label="Voltar à página inicial">
           <i class="fas fa-arrow-left"></i> Voltar
         </a>
         <div class="logo-text">Garrafeira MAGAVI</div>
@@ -21,33 +22,39 @@
       </div>
     </header>
 
+    <!-- Conteúdo principal -->
     <main class="main-content">
       <h1 class="page-title">Menu Digital</h1>
       
-      <div class="categories-scroll">
+      <!-- Categorias -->
+      <nav class="categories-scroll" aria-label="Filtrar produtos por categoria">
         <div class="categories">
           <button class="category-btn active" data-category="todos">Todos</button>
           <button class="category-btn" data-category="vinhos">Vinhos</button>
-          <button class="category-btn" data-category="destilados">Destilados</button>
+          <button class="category-btn" data-category="whisky">Whisky</button>
+          <button class="category-btn" data-category="champanhe">Champanhe</button>
+          <button class="category-btn" data-category="bebidas-lata">Bebidas em Lata</button>
           <button class="category-btn" data-category="cervejas">Cervejas</button>
-          <button class="category-btn" data-category="aperitivos">Aperitivos</button>
+          <button class="category-btn" data-category="cigarros">Cigarros</button>
           <button class="category-btn" data-category="promocoes">Promoções</button>
         </div>
-      </div>
+      </nav>
       
-      <div class="products-grid" id="products-container">
-        <!-- Produtos via JavaScript -->
-      </div>
+      <!-- Produtos -->
+      <section class="products-grid" id="products-container" aria-live="polite">
+        <!-- Produtos serão adicionados via JavaScript -->
+      </section>
     </main>
 
-    <div class="floating-footer">
-      <a href="https://wa.me/244900000000" class="whatsapp-btn" target="_blank">
+    <!-- Footer flutuante -->
+    <footer class="floating-footer">
+      <a href="https://wa.me/244900000000" class="whatsapp-btn" target="_blank" aria-label="Encomendar via WhatsApp">
         <i class="fab fa-whatsapp"></i> Encomendar via WhatsApp
       </a>
-      <a href="menu-admin.html" class="admin-link">
+      <a href="menu-admin.html" class="admin-link" aria-label="Acesso administrativo">
         <i class="fas fa-lock"></i> Acesso administrativo
       </a>
-    </div>
+    </footer>
   </div>
 
   <script src="assets/js/menu.js" defer></script>

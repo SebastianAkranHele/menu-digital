@@ -38,6 +38,21 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
   });
 });
 
+// Função para exibir nome completo da categoria
+function getCategoryName(value) {
+  const categories = {
+    vinhos: 'Vinhos',
+    whisky: 'Whisky',
+    champanhe: 'Champanhe',
+    'bebidas-lata': 'Bebidas em Lata',
+    cervejas: 'Cervejas',
+    cigarros: 'Cigarros',
+    aperitivos: 'Aperitivos',
+    promocoes: 'Promoções'
+  };
+  return categories[value] || value;
+}
+
 // Load produtos
 function loadProducts() {
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
@@ -68,11 +83,6 @@ function loadProducts() {
 
   document.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.dataset.index)));
   document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', () => deleteProduct(btn.dataset.index)));
-}
-
-function getCategoryName(value) {
-  const categories = {vinhos:'Vinhos',destilados:'Destilados',cervejas:'Cervejas',aperitivos:'Aperitivos',promocoes:'Promoções'};
-  return categories[value] || value;
 }
 
 // Formulário novo produto
@@ -123,22 +133,13 @@ function openEditModal(index){
   document.getElementById('edit-category').value = product.category;
   document.getElementById('edit-description').value = product.description;
 
-  // Configura imagem
-  if(product.image && product.image.startsWith("http")) {
-    editImageType = "url";
-    editSelectedImage = null;
-    document.getElementById("edit-image-type").value = "url";
-    document.getElementById("edit-upload-group").style.display = "none";
-    document.getElementById("edit-url-group").style.display = "block";
-    document.getElementById("edit-product-image-url").value = product.image;
-  } else {
-    editImageType = "upload";
-    editSelectedImage = product.image || null;
-    document.getElementById("edit-image-type").value = "upload";
-    document.getElementById("edit-upload-group").style.display = "block";
-    document.getElementById("edit-url-group").style.display = "none";
-    document.getElementById("edit-product-image-url").value = "";
-  }
+  editSelectedImage = product.image || null;
+  editImageType = product.image && product.image.startsWith("http") ? "url" : "upload";
+
+  // Alternar visibilidade dos grupos de imagem
+  document.getElementById("edit-upload-group").style.display = editImageType === "upload" ? "block" : "none";
+  document.getElementById("edit-url-group").style.display = editImageType === "url" ? "block" : "none";
+  document.getElementById("edit-product-image-url").value = editImageType === "url" ? product.image : "";
 
   editProductIndex = index;
   editModal.style.display = 'block';
