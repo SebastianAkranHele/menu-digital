@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu Digital — Garrafeira MAGAVI</title>
+  <meta name="description" content="Menu digital da Garrafeira MAGAVI: vinhos, destilados, cervejas e aperitivos." />
+  <meta name="theme-color" content="#800000" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/menu.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn">
+          <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <div class="logo-text">Garrafeira MAGAVI</div>
+        <div style="width: 60px;"></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <h1 class="page-title">Menu Digital</h1>
+      
+      <div class="categories-scroll">
+        <div class="categories">
+          <button class="category-btn active" data-category="todos">Todos</button>
+          <button class="category-btn" data-category="vinhos">Vinhos</button>
+          <button class="category-btn" data-category="destilados">Destilados</button>
+          <button class="category-btn" data-category="cervejas">Cervejas</button>
+          <button class="category-btn" data-category="aperitivos">Aperitivos</button>
+          <button class="category-btn" data-category="promocoes">Promoções</button>
+        </div>
+      </div>
+      
+      <div class="products-grid" id="products-container">
+        <!-- Produtos via JavaScript -->
+      </div>
+    </main>
+
+    <div class="floating-footer">
+      <a href="https://wa.me/244900000000" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i> Encomendar via WhatsApp
+      </a>
+      <a href="menu-admin.html" class="admin-link">
+        <i class="fas fa-lock"></i> Acesso administrativo
+      </a>
+    </div>
+  </div>
+
+  <script src="assets/js/menu.js" defer></script>
+</body>
+</html>

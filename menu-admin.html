@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin - Garrafeira MAGAVI</title>
+  <meta name="description" content="Sistema de administração para o menu digital da Garrafeira MAGAVI." />
+  <meta name="theme-color" content="#800000" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/menu-admin.css">
+  
+  <script>
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+</head>
+<body>
+  <div class="admin-container">
+    <header class="admin-header">
+      <h1>Painel Administrativo - Garrafeira MAGAVI</h1>
+    </header>
+    
+    <nav class="admin-nav">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="products">Gerenciar Produtos</button>
+        <button class="nav-tab" data-tab="categories">Categorias</button>
+        <button class="nav-tab" data-tab="settings">Configurações</button>
+        <button id="logout-btn" class="btn btn-danger">Sair</button>
+      </div>
+      <div>
+        <a href="menu.html" class="btn btn-primary"><span>Voltar ao Menu</span></a>
+      </div>
+    </nav>
+    
+    <main class="admin-content">
+      <!-- Aba Produtos -->
+      <div class="tab-content active" id="products-tab">
+        <h2>Adicionar Novo Produto</h2>
+        <div id="form-alert"></div>
+        
+        <form id="product-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="product-name">Nome do Produto</label>
+              <input type="text" id="product-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="product-price">Preço (Kz)</label>
+              <input type="number" id="product-price" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="product-category">Categoria</label>
+              <select id="product-category" class="form-control" required>
+                <option value="">Selecione uma categoria</option>
+                <option value="vinhos">Vinhos</option>
+                <option value="destilados">Destilados</option>
+                <option value="cervejas">Cervejas</option>
+                <option value="aperitivos">Aperitivos</option>
+                <option value="promocoes">Promoções</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Imagem do Produto</label>
+              <select id="image-type" class="form-control">
+                <option value="upload">Upload do computador</option>
+                <option value="url">Link da internet</option>
+              </select>
+            </div>
+            <div class="form-group" id="upload-group">
+              <input type="file" id="product-image" class="form-control" accept="image/*">
+              <p class="help-text">Escolha uma imagem do seu dispositivo</p>
+            </div>
+            <div class="form-group" id="url-group" style="display:none;">
+              <input type="url" id="product-image-url" class="form-control" placeholder="https://exemplo.com/imagem.jpg">
+              <p class="help-text">Cole o link da imagem hospedada na internet</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="product-description">Descrição</label>
+            <textarea id="product-description" class="form-control" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Adicionar Produto</button>
+        </form>
+        
+        <hr style="margin: 30px 0; border-color: #e5e7eb;">
+        
+        <h2>Produtos Cadastrados</h2>
+        <div class="products-grid" id="products-list"></div>
+      </div>
+      
+      <!-- Aba Categorias -->
+      <div class="tab-content" id="categories-tab">
+        <h2>Gerenciar Categorias</h2>
+        <p>Em desenvolvimento...</p>
+      </div>
+      
+      <!-- Aba Configurações -->
+      <div class="tab-content" id="settings-tab">
+        <h2>Configurações do Menu</h2>
+        <p>Em desenvolvimento...</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/menu-admin.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code com Logo — Garrafeira MAGAVI</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #800000;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .qr-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    canvas {
+      margin-top: 10px;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #800000;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background: #a00000;
+    }
+
+    p {
+      margin-top: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-box">
+    <h1>Menu Digital 🍷</h1>
+    <canvas id="qrcode"></canvas>
+    <p>Escaneie o QR Code para aceder ao menu</p>
+    <a id="download-link" class="download-btn" download="qrcode-magavi.png">📥 Baixar QR Code</a>
+  </div>
+
+  <script>
+    const menuLink = "https://teu-dominio.com/index.html"; // 👉 link do menu digital
+    const canvas = document.getElementById("qrcode");
+
+    // gera o QR Code
+    QRCode.toCanvas(canvas, menuLink, {
+      width: 300,
+      color: {
+        dark: "#800000",
+        light: "#ffffff"
+      }
+    }, function (error) {
+      if (error) console.error(error);
+      else {
+        console.log("✅ QR Code gerado!");
+        addLogoToQR();
+      }
+    });
+
+    function addLogoToQR() {
+      const ctx = canvas.getContext("2d");
+
+      // carrega a logo (coloca a tua imagem em assets/img/logo.png)
+      const logo = new Image();
+      logo.src = "assets/img/logo.png"; // 👉 muda para o caminho correto da tua logo
+      logo.onload = function () {
+        const logoSize = 70; // tamanho da logo no centro
+        const x = (canvas.width - logoSize) / 2;
+        const y = (canvas.height - logoSize) / 2;
+
+        ctx.fillStyle = "white"; // fundo branco atrás da logo
+        ctx.fillRect(x - 8, y - 8, logoSize + 16, logoSize + 16);
+
+        ctx.drawImage(logo, x, y, logoSize, logoSize);
+
+        // botão de download atualizado com logo aplicada
+        const downloadLink = document.getElementById("download-link");
+        downloadLink.href = canvas.toDataURL("image/png");
+      };
+    }
+  </script>
+</body>
+</html>
