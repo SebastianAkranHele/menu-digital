@@ -14,35 +14,48 @@
   <!-- CSS -->
   <link rel="stylesheet" href="assets/css/menu-admin.css">
 
+  <!-- Proteção: redireciona se não logado -->
   <script>
-    if(sessionStorage.getItem("isLoggedIn") !== "true"){
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
       window.location.href = "login.html";
     }
   </script>
 </head>
 <body>
   <div class="admin-container">
+    <!-- Cabeçalho -->
     <header class="admin-header">
       <h1>Painel Administrativo</h1>
     </header>
 
+    <!-- Navegação -->
     <nav class="admin-nav">
       <div class="nav-tabs">
-        <button class="nav-tab active" data-tab="products">Produtos</button>
-        <button class="nav-tab" data-tab="categories">Categorias</button>
-        <button id="logout-btn" class="btn btn-danger">Sair</button>
+        <button class="nav-tab active" data-tab="products">
+          <i class="fas fa-box"></i> Produtos
+        </button>
+        <button class="nav-tab" data-tab="categories">
+          <i class="fas fa-list"></i> Categorias
+        </button>
+        <button id="go-to-menu" class="btn btn-secondary">
+          <i class="fas fa-utensils"></i> Ir para o Menu
+        </button>
+        <button id="logout-btn" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
       </div>
     </nav>
 
+    <!-- Conteúdo principal -->
     <main class="admin-content">
+
       <!-- Produtos -->
-      <!-- Produtos -->
-<div class="tab-content active" id="products-tab">
-  <!-- Botões de ação -->
-  <div class="actions" style="margin-bottom: 15px;">
-    <button id="open-add-modal" class="btn btn-primary">Adicionar Produto</button>
-    <button id="go-to-menu" class="btn btn-secondary">Ir para o Menu</button>
-  </div>
+      <div class="tab-content active" id="products-tab">
+        <div class="actions" style="margin-bottom: 15px;">
+          <button id="open-add-modal" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Adicionar Produto
+          </button>
+        </div>
 
         <hr>
         <h2>Produtos Cadastrados</h2>
@@ -57,8 +70,11 @@
             <label for="category-name">Nova Categoria</label>
             <input type="text" id="category-name" class="form-control" required>
           </div>
-          <button type="submit" class="btn btn-primary">Adicionar Categoria</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Adicionar Categoria
+          </button>
         </form>
+
         <table id="categories-table" class="categories-table">
           <thead>
             <tr>
@@ -68,7 +84,6 @@
           </thead>
           <tbody></tbody>
         </table>
-
       </div>
     </main>
 
@@ -91,6 +106,7 @@
               <label for="product-category">Categoria</label>
               <select id="product-category" class="form-control" required></select>
             </div>
+            <!-- Tipo de imagem -->
             <div class="form-group">
               <label>Imagem</label>
               <select id="image-type" class="form-control">
@@ -114,7 +130,7 @@
       </div>
     </div>
 
-    <!-- Modal de edição -->
+    <!-- Modal de Edição -->
     <div id="edit-modal" class="modal">
       <div class="modal-content">
         <span class="close-btn">&times;</span>
@@ -156,6 +172,7 @@
     </div>
   </div>
 
+  <!-- Script principal -->
   <script src="assets/js/menu-admin.js" defer></script>
 </body>
 </html>
