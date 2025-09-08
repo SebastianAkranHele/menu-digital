@@ -1,0 +1,17 @@
+# Node.js
+backend/node_modules/
+backend/package-lock.json
+
+# Base de dados local (SQLite)
+backend/database.db
+
+# Logs
+backend/logs
+backend/*.log
+
+# Ambiente / variáveis secretas
+backend/.env
+
+# Sistema
+.DS_Store
+Thumbs.db
