@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Code com Logo — Garrafeira MAGAF</title>
+  <title>QR Code — Menu Digital Garrafeira MAGAVI</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
     body {
@@ -15,6 +15,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      padding: 10px;
     }
     h1 {
       color: #800000;
@@ -27,9 +28,12 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
+      max-width: 100%;
     }
     canvas {
       margin-top: 10px;
+      max-width: 90vw; /* Responsividade */
+      height: auto;
     }
     .download-btn {
       display: inline-block;
@@ -54,10 +58,18 @@
 <body>
   <div class="qr-box">
     <h1>Menu Digital 🍷</h1>
-    <canvas id="qrcode"></canvas>
+    <canvas id="qrcode" role="img" aria-label="QR Code para o menu digital da Garrafeira MAGAVI"></canvas>
     <p>Escaneie o QR Code para aceder ao menu</p>
     <a id="download-link" class="download-btn" download="qrcode-magavi.png">📥 Baixar QR Code</a>
   </div>
+
+  <noscript>
+    <p>📄 Veja o menu:
+      <a href="https://sebastianakranhele.github.io/menu-digital/index.html" target="_blank">
+        Clique aqui
+      </a>
+    </p>
+  </noscript>
 
   <script>
     const menuLink = "https://sebastianakranhele.github.io/menu-digital/index.html";
@@ -71,19 +83,18 @@
       color: { dark: "#800000", light: "#ffffff" }
     }, function (error) {
       if (error) console.error(error);
-      else addLogoToQR(); // tenta adicionar a logo
-      // garante que o botão de download está ativo desde o início
+      else addLogoToQR(); 
       downloadLink.href = canvas.toDataURL("image/png");
     });
 
     function addLogoToQR() {
       const ctx = canvas.getContext("2d");
       const logo = new Image();
-      logo.crossOrigin = "anonymous"; // evita problemas de CORS
+      logo.crossOrigin = "anonymous"; 
       logo.src = "https://sebastianakranhele.github.io/menu-digital/assets/img/magaf1.jpg";
 
       logo.onload = function () {
-        const logoSize = 70;
+        const logoSize = canvas.width * 0.2; // 20% do tamanho do QR
         const x = (canvas.width - logoSize) / 2;
         const y = (canvas.height - logoSize) / 2;
 
@@ -91,7 +102,7 @@
         ctx.fillRect(x - 8, y - 8, logoSize + 16, logoSize + 16);
         ctx.drawImage(logo, x, y, logoSize, logoSize);
 
-        // atualiza o download com a versão final (QR + logo)
+        // Atualiza o download com logo
         downloadLink.href = canvas.toDataURL("image/png");
       };
 
