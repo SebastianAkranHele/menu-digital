@@ -1,4 +1,6 @@
-// Autenticação
+// =======================
+// Configurações iniciais
+// =======================
 if (sessionStorage.getItem("isLoggedIn") !== "true") {
   window.location.href = "login.html";
 }
@@ -7,67 +9,125 @@ let selectedImage = null;
 let imageType = "upload";
 
 let editSelectedImage = null;
+let editProductIndex = null;
 let editImageType = "upload";
 
-// Alterna entre upload e URL (novo produto)
-document.getElementById("image-type").addEventListener("change", function() {
-  imageType = this.value;
-  document.getElementById("upload-group").style.display = imageType === "upload" ? "block" : "none";
-  document.getElementById("url-group").style.display = imageType === "url" ? "block" : "none";
-});
+// =======================
+// Funções de Categoria
+// =======================
+function loadCategories() {
+  let categories = JSON.parse(localStorage.getItem('garrafeira-categories')) || [];
 
-// Seleção de imagem (novo produto)
-document.getElementById('product-image').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      selectedImage = event.target.result; // Base64
-    };
-    reader.readAsDataURL(file);
-  }
-});
-
-// Abas
-document.querySelectorAll('.nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+  // Adiciona categorias existentes nos produtos
+  const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
+  products.forEach(prod => {
+    if(prod.category && !categories.includes(prod.category)){
+      categories.push(prod.category);
+    }
   });
-});
 
-// Função para exibir nome completo da categoria
-function getCategoryName(value) {
-  const categories = {
-    vinhos: 'Vinhos',
-    whisky: 'Whisky',
-    champanhe: 'Champanhe',
-    'bebidas-lata': 'Bebidas em Lata',
-    cervejas: 'Cervejas',
-    cigarros: 'Cigarros',
-    aperitivos: 'Aperitivos',
-    promocoes: 'Promoções'
-  };
-  return categories[value] || value;
+  localStorage.setItem('garrafeira-categories', JSON.stringify(categories));
+
+  // Popula selects
+  const categorySelect = document.getElementById('product-category');
+  const editCategorySelect = document.getElementById('edit-category');
+
+  categorySelect.innerHTML = `<option value="">Selecione uma categoria</option>`;
+  editCategorySelect.innerHTML = '';
+
+  categories.forEach(cat => {
+    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+    editCategorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+  });
+
+  // Lista de categorias em tabela
+  const tableBody = document.querySelector('#categories-table tbody');
+  if(tableBody){
+    tableBody.innerHTML = '';
+    categories.forEach((cat, i) => {
+      const tr = document.createElement('tr');
+
+      const tdName = document.createElement('td');
+      tdName.textContent = cat;
+
+      const tdActions = document.createElement('td');
+      const btn = document.createElement('button');
+      btn.textContent = 'Excluir';
+      btn.className = 'btn btn-sm btn-danger';
+      btn.addEventListener('click', () => deleteCategorySweetAlert(i));
+      tdActions.appendChild(btn);
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdActions);
+      tableBody.appendChild(tr);
+    });
+  }
 }
 
-// Load produtos
+function addCategory(name) {
+  const categories = JSON.parse(localStorage.getItem('garrafeira-categories')) || [];
+  if(categories.includes(name)) {
+    Swal.fire('Erro', 'Categoria já existe!', 'error');
+    return;
+  }
+  categories.push(name);
+  localStorage.setItem('garrafeira-categories', JSON.stringify(categories));
+  loadCategories();
+  Swal.fire('Sucesso','Categoria adicionada!','success');
+}
+
+function deleteCategorySweetAlert(index){
+  Swal.fire({
+    title: 'Tem certeza?',
+    text: 'Deseja excluir esta categoria?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sim, excluir!',
+    cancelButtonText: 'Cancelar'
+  }).then(result => {
+    if(result.isConfirmed){
+      const categories = JSON.parse(localStorage.getItem('garrafeira-categories')) || [];
+      const categoryToDelete = categories[index];
+
+      // Remove produtos dessa categoria
+      let products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
+      products = products.filter(p => p.category !== categoryToDelete);
+      localStorage.setItem('garrafeira-products', JSON.stringify(products));
+
+      // Remove categoria
+      categories.splice(index, 1);
+      localStorage.setItem('garrafeira-categories', JSON.stringify(categories));
+
+      loadCategories();
+      loadProducts();
+      Swal.fire('Excluído!', 'Categoria excluída com sucesso.', 'success');
+    }
+  });
+}
+
+
+// =======================
+// Funções de Produto
+// =======================
+function getCategoryName(value) { return value; }
+
 function loadProducts() {
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
   const productsList = document.getElementById('products-list');
-  if (products.length === 0) {
-    productsList.innerHTML = `<div class="empty-state"><i class="fas fa-wine-bottle"></i><p>Nenhum produto cadastrado ainda.</p></div>`;
+
+  if(products.length === 0){
+    productsList.innerHTML = `<div class="empty-state"><i class="fas fa-wine-bottle"></i><p>Nenhum produto cadastrado.</p></div>`;
     return;
   }
 
   productsList.innerHTML = '';
-  products.forEach((product, index) => {
-    const productCard = document.createElement('div');
-    productCard.className = 'product-card';
-    productCard.innerHTML = `
-      <div class="product-image">${product.image ? `<img src="${product.image}" alt="${product.name}">` : `<i class="fas fa-wine-bottle" style="font-size: 3rem;"></i>`}</div>
+  products.forEach((product,index)=>{
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-image">${product.image ? `<img src="${product.image}" alt="${product.name}">` : `<i class="fas fa-wine-bottle" style="font-size:3rem;"></i>`}</div>
       <div class="product-info">
         <h3 class="product-name">${product.name}</h3>
         <span class="product-category">${getCategoryName(product.category)}</span>
@@ -77,19 +137,57 @@ function loadProducts() {
           <button class="btn btn-sm btn-primary edit-product" data-index="${index}">Editar</button>
           <button class="btn btn-sm btn-danger delete-product" data-index="${index}">Excluir</button>
         </div>
-      </div>`;
-    productsList.appendChild(productCard);
+      </div>
+    `;
+    productsList.appendChild(card);
   });
 
-  document.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', () => openEditModal(btn.dataset.index)));
-  document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', () => deleteProduct(btn.dataset.index)));
+  document.querySelectorAll('.edit-product').forEach(btn=>{
+    btn.addEventListener('click', ()=>openEditModal(btn.dataset.index));
+  });
+  document.querySelectorAll('.delete-product').forEach(btn=>{
+    btn.addEventListener('click', ()=>deleteProduct(btn.dataset.index));
+  });
 }
 
-// Formulário novo produto
-document.getElementById('product-form').addEventListener('submit', function(e){
+// =======================
+// Modal Adicionar Produto
+// =======================
+const addModal = document.getElementById('add-product-modal');
+const openAddBtn = document.getElementById('open-add-modal');
+const closeAddBtn = document.getElementById('close-add-modal');
+
+openAddBtn.addEventListener('click', ()=>{
+  document.getElementById('add-product-form').reset();
+  document.getElementById('image-type').value = 'upload';
+  document.getElementById('upload-group').style.display = 'block';
+  document.getElementById('url-group').style.display = 'none';
+  selectedImage = null;
+  addModal.style.display = 'flex';
+});
+
+closeAddBtn.addEventListener('click', ()=>addModal.style.display='none');
+window.addEventListener('click', e=>{ if(e.target===addModal) addModal.style.display='none'; });
+
+document.getElementById('image-type').addEventListener('change', function(){
+  imageType = this.value;
+  document.getElementById('upload-group').style.display = imageType==='upload'?'block':'none';
+  document.getElementById('url-group').style.display = imageType==='url'?'block':'none';
+});
+
+document.getElementById('product-image').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(event){ selectedImage = event.target.result; };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById('add-product-form').addEventListener('submit', function(e){
   e.preventDefault();
-  let finalImage = imageType === "upload" ? selectedImage : document.getElementById("product-image-url").value.trim() || null;
-  if(!finalImage) return Swal.fire('Erro', 'Por favor, insira uma imagem.', 'error');
+  const finalImage = imageType==='upload'?selectedImage:document.getElementById('product-image-url').value.trim()||null;
+  if(!finalImage) return Swal.fire('Erro','Por favor, insira uma imagem','error');
 
   const product = {
     name: document.getElementById('product-name').value,
@@ -99,101 +197,96 @@ document.getElementById('product-form').addEventListener('submit', function(e){
     image: finalImage
   };
 
-  if(parseFloat(product.price) <= 0) return Swal.fire('Erro','Por favor, insira um preço válido','error');
+  if(parseFloat(product.price)<=0) return Swal.fire('Erro','Preço inválido','error');
 
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
   products.push(product);
-  localStorage.setItem('garrafeira-products', JSON.stringify(products));
+  localStorage.setItem('garrafeira-products',JSON.stringify(products));
   loadProducts();
   this.reset();
-  document.getElementById("image-type").value = "upload";
-  document.getElementById("upload-group").style.display = "block";
-  document.getElementById("url-group").style.display = "none";
-  selectedImage = null;
-  Swal.fire('Sucesso','Produto adicionado com sucesso!','success');
+  document.getElementById('image-type').value='upload';
+  document.getElementById('upload-group').style.display='block';
+  document.getElementById('url-group').style.display='none';
+  selectedImage=null;
+  addModal.style.display='none';
+  Swal.fire('Sucesso','Produto adicionado!','success');
 });
 
-// Logout
-document.getElementById("logout-btn").addEventListener("click", () => {
-  sessionStorage.removeItem("isLoggedIn");
-  window.location.href = "login.html";
-});
-
-// Modal de edição com imagem
+// =======================
+// Edit Modal
+// =======================
 const editModal = document.getElementById('edit-modal');
-const closeBtn = document.querySelector('.close-btn');
-let editProductIndex = null;
+const closeBtn = document.querySelector('#edit-modal .close-btn');
 
 function openEditModal(index){
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
   const product = products[index];
+
+  document.getElementById('edit-product-form').reset();
+  editSelectedImage = null;
 
   document.getElementById('edit-name').value = product.name;
   document.getElementById('edit-price').value = product.price;
   document.getElementById('edit-category').value = product.category;
   document.getElementById('edit-description').value = product.description;
 
-  editSelectedImage = product.image || null;
-  editImageType = product.image && product.image.startsWith("http") ? "url" : "upload";
-
-  // Alternar visibilidade dos grupos de imagem
-  document.getElementById("edit-upload-group").style.display = editImageType === "upload" ? "block" : "none";
-  document.getElementById("edit-url-group").style.display = editImageType === "url" ? "block" : "none";
-  document.getElementById("edit-product-image-url").value = editImageType === "url" ? product.image : "";
+  editSelectedImage = product.image;
+  editImageType = product.image && product.image.startsWith('http')?'url':'upload';
+  document.getElementById('edit-image-type').value = editImageType;
+  document.getElementById('edit-upload-group').style.display = editImageType==='upload'?'block':'none';
+  document.getElementById('edit-url-group').style.display = editImageType==='url'?'block':'none';
+  if(editImageType==='url') document.getElementById('edit-product-image-url').value = product.image;
 
   editProductIndex = index;
-  editModal.style.display = 'block';
+  editModal.style.display='flex';
 }
 
-// Fechar modal
-closeBtn.addEventListener('click', () => editModal.style.display='none');
-window.addEventListener('click', e => { if(e.target === editModal) editModal.style.display='none'; });
+closeBtn.addEventListener('click', ()=>editModal.style.display='none');
+window.addEventListener('click', e=>{ if(e.target===editModal) editModal.style.display='none'; });
 
-// Alterna entre upload e URL no modal
-document.getElementById("edit-image-type").addEventListener("change", function() {
+document.getElementById('edit-image-type').addEventListener('change', function(){
   editImageType = this.value;
-  document.getElementById("edit-upload-group").style.display = editImageType === "upload" ? "block" : "none";
-  document.getElementById("edit-url-group").style.display = editImageType === "url" ? "block" : "none";
+  document.getElementById('edit-upload-group').style.display = editImageType==='upload'?'block':'none';
+  document.getElementById('edit-url-group').style.display = editImageType==='url'?'block':'none';
 });
 
-// Seleção de imagem no modal
-document.getElementById('edit-product-image').addEventListener('change', function(e) {
+document.getElementById('edit-product-image').addEventListener('change', function(e){
   const file = e.target.files[0];
-  if(file) {
+  if(file){
     const reader = new FileReader();
-    reader.onload = function(event) {
-      editSelectedImage = event.target.result;
-    };
+    reader.onload = function(event){ editSelectedImage = event.target.result; };
     reader.readAsDataURL(file);
   }
 });
 
-// Submeter edição
 document.getElementById('edit-product-form').addEventListener('submit', function(e){
   e.preventDefault();
   const products = JSON.parse(localStorage.getItem('garrafeira-products')) || [];
   const product = products[editProductIndex];
+
   product.name = document.getElementById('edit-name').value;
   product.price = document.getElementById('edit-price').value;
   product.category = document.getElementById('edit-category').value;
   product.description = document.getElementById('edit-description').value;
 
-  const finalImage = editImageType === "upload" ? editSelectedImage : document.getElementById("edit-product-image-url").value.trim() || null;
-  if(!finalImage) return Swal.fire('Erro','Por favor, insira uma imagem.','error');
+  const finalImage = editImageType==='upload'?editSelectedImage:document.getElementById('edit-product-image-url').value.trim()||null;
+  if(!finalImage) return Swal.fire('Erro','Insira uma imagem','error');
   product.image = finalImage;
 
   products[editProductIndex] = product;
-  localStorage.setItem('garrafeira-products', JSON.stringify(products));
+  localStorage.setItem('garrafeira-products',JSON.stringify(products));
   loadProducts();
   editModal.style.display='none';
-  Swal.fire('Sucesso','Produto atualizado com sucesso!','success');
+  Swal.fire('Sucesso','Produto atualizado!','success');
 });
 
-// Deletar produto
+// =======================
+// Deletar Produto
+// =======================
 function deleteProduct(index){
   Swal.fire({
     title:'Tem certeza?',
-    text:"Deseja realmente excluir este produto?",
+    text:'Deseja excluir este produto?',
     icon:'warning',
     showCancelButton:true,
     confirmButtonColor:'#d33',
@@ -211,5 +304,46 @@ function deleteProduct(index){
   });
 }
 
-// Carregar produtos
-document.addEventListener('DOMContentLoaded', loadProducts);
+// =======================
+// Categorias Form
+// =======================
+document.getElementById('category-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('category-name').value.trim();
+  if(name === '') return;
+  addCategory(name);
+  this.reset();
+});
+
+// =======================
+// Logout
+// =======================
+document.getElementById('logout-btn').addEventListener('click', ()=>{
+  sessionStorage.removeItem('isLoggedIn');
+  window.location.href = 'login.html';
+});
+
+// =======================
+// Abas
+// =======================
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+  });
+});
+
+// =======================
+// Inicialização
+// =======================
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadCategories();
+  loadProducts();
+
+  // Botão Ir para o Menu
+  document.getElementById('go-to-menu').addEventListener('click', ()=>{
+    window.location.href = 'menu.html';
+  });
+});
