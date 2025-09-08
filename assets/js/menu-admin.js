@@ -318,10 +318,57 @@ document.getElementById('category-form').addEventListener('submit', function(e){
 // =======================
 // Logout
 // =======================
-document.getElementById('logout-btn').addEventListener('click', ()=>{
-  sessionStorage.removeItem('isLoggedIn');
-  window.location.href = 'login.html';
-});
+const logoutBtn = document.getElementById('logout-btn');
+
+if(logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    Swal.fire({
+      title: 'Sair da conta?',
+      text: "Você será desconectado da sessão atual.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, sair',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      background: '#800000',
+      color: '#fff',
+      confirmButtonColor: '#d4af37',
+      cancelButtonColor: '#6b7280',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let timerInterval;
+        Swal.fire({
+          title: 'Saindo...',
+          html: 'Redirecionando em <b></b> segundos',
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: () => {
+            const b = Swal.getHtmlContainer().querySelector('b');
+            timerInterval = setInterval(() => {
+              b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+            }, 100);
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+          background: '#800000',
+          color: '#fff',
+          showConfirmButton: false
+        }).then(() => {
+          sessionStorage.removeItem('isLoggedIn');
+          window.location.href = 'login.html';
+        });
+      }
+    });
+  });
+}
+
 
 // =======================
 // Abas

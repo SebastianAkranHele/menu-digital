@@ -29,13 +29,40 @@ BUTTONS.forEach(({key, label, cls, icon, badge}) => {
 
   const a = document.createElement('a');
   a.href = href;
-  a.target = href.startsWith('http') ? '_blank' : '_self';
-  a.rel = 'noopener';
   a.className = `btn ${cls}`;
   a.innerHTML = `
     <span class="ico"><i class="${icon}"></i></span>
     <span>${label}</span>
     <span class="badge">${badge ?? ''}</span>
   `;
+
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // Toast animado
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: `${label} será aberto`,
+      showConfirmButton: false,
+      timer: 1200,
+      timerProgressBar: true,
+      background: '#800000',
+      color: '#fff'
+    });
+
+    // Abrir link após o toast
+    setTimeout(() => {
+      // Menu digital abre na mesma aba
+      if (key === 'menu') {
+        window.location.href = href;
+      } else {
+        // Outros links externos
+        window.open(href, '_blank');
+      }
+    }, 1300);
+  });
+
   linksEl.appendChild(a);
 });
