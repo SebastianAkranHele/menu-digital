@@ -1,0 +1,20 @@
+{
+  "name": "menu-digital",
+  "version": "1.0.0",
+  "description": "🍷 Garrafeira MAGAVI — Hub Digital & Menu Digital",
+  "main": "frontend-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebastianAkranHele/menu-digital.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SebastianAkranHele/menu-digital/issues"
+  },
+  "homepage": "https://github.com/SebastianAkranHele/menu-digital#readme"
+}

@@ -72,8 +72,14 @@ body {
 
 /* Content */
 .admin-content { padding: 20px; }
-.tab-content { display: none; }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
 .tab-content.active { display: block; }
+
+/* Animação de transição tabs */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* Títulos das seções */
 h2 {
@@ -98,6 +104,14 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-danger:hover { background: #cc3333; }
 .btn-sm { padding: 5px 10px; font-size: 0.875rem; }
+
+/* Estado loading/desativado */
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
 
 /* ========================= */
 /* Grid de Produtos           */
@@ -158,6 +172,12 @@ textarea.form-control { min-height: 100px; resize: vertical; }
   max-height: 100%;
   transform: translate(-50%, -50%);
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Zoom suave no hover */
+.product-card:hover img {
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 .product-info {
@@ -216,6 +236,15 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 @keyframes modalFadeIn {
   from { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
   to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Ajuste modal no mobile */
+@media (max-width: 500px) {
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+    border-radius: 10px;
+  }
 }
 
 .close-btn {

@@ -11,7 +11,7 @@ async function initDb() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
+      name TEXT NOT NULL UNIQUE
     );
   `);
 
@@ -24,6 +24,7 @@ async function initDb() {
       description TEXT,
       image TEXT,
       category_id INTEGER,
+      stock INTEGER DEFAULT 0,
       FOREIGN KEY (category_id) REFERENCES categories(id)
     );
   `);

@@ -13,13 +13,6 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="assets/css/menu-admin.css">
-
-  <!-- Proteção: redireciona se não logado -->
-  <script>
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "login.html";
-    }
-  </script>
 </head>
 <body>
   <div class="admin-container">
@@ -31,7 +24,7 @@
     <!-- Navegação -->
     <nav class="admin-nav">
       <div class="nav-tabs">
-        <button class="nav-tab active" data-tab="products">
+        <button class="nav-tab" data-tab="products">
           <i class="fas fa-box"></i> Produtos
         </button>
         <button class="nav-tab" data-tab="categories">
@@ -46,17 +39,15 @@
       </div>
     </nav>
 
-    <!-- Conteúdo principal -->
+    <!-- Conteúdo -->
     <main class="admin-content">
-
       <!-- Produtos -->
-      <div class="tab-content active" id="products-tab">
+      <div class="tab-content" id="products-tab">
         <div class="actions" style="margin-bottom: 15px;">
           <button id="open-add-modal" class="btn btn-primary">
             <i class="fas fa-plus"></i> Adicionar Produto
           </button>
         </div>
-
         <hr>
         <h2>Produtos Cadastrados</h2>
         <div class="products-grid" id="products-list"></div>
@@ -68,7 +59,7 @@
         <form id="category-form">
           <div class="form-group">
             <label for="category-name">Nova Categoria</label>
-            <input type="text" id="category-name" class="form-control" required>
+            <input type="text" id="category-name" name="category-name" class="form-control" required>
           </div>
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Adicionar Categoria
@@ -87,84 +78,117 @@
       </div>
     </main>
 
-    <!-- Modal de Adicionar Produto -->
-    <div id="add-product-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" id="close-add-modal">&times;</span>
-        <h2>Adicionar Novo Produto</h2>
-        <form id="add-product-form">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="product-name">Nome</label>
-              <input type="text" id="product-name" class="form-control" required>
-            </div>
-            <div class="form-group">
-              <label for="product-price">Preço (Kz)</label>
-              <input type="number" id="product-price" class="form-control" min="0" step="0.01" required>
-            </div>
-            <div class="form-group">
-              <label for="product-category">Categoria</label>
-              <select id="product-category" class="form-control" required></select>
-            </div>
-            <!-- Tipo de imagem -->
-            <div class="form-group">
-              <label>Imagem</label>
-              <select id="image-type" class="form-control">
-                <option value="upload">Upload</option>
-                <option value="url">URL</option>
-              </select>
-            </div>
-            <div class="form-group" id="upload-group">
-              <input type="file" id="product-image" class="form-control" accept="image/*">
-            </div>
-            <div class="form-group" id="url-group" style="display:none;">
-              <input type="url" id="product-image-url" class="form-control" placeholder="https://exemplo.com/imagem.jpg">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="product-description">Descrição</label>
-            <textarea id="product-description" class="form-control" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Adicionar Produto</button>
-        </form>
+    <!-- Modais -->
+    <!-- Modal Adicionar Produto -->
+<div id="add-product-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal(document.getElementById('add-product-modal'))">&times;</span>
+    <h2>Adicionar Produto</h2>
+    <form id="add-product-form">
+      <div class="form-group">
+        <label for="product-name">Nome</label>
+        <input type="text" id="product-name" name="name" class="form-control" required>
       </div>
-    </div>
+      <div class="form-group">
+        <label for="product-price">Preço</label>
+        <input type="number" id="product-price" name="price" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="product-category">Categoria</label>
+        <select id="product-category" name="category" class="form-control" required></select>
+      </div>
+      <div class="form-group">
+        <label for="product-description">Descrição</label>
+        <textarea id="product-description" name="description" class="form-control"></textarea>
+      </div>
 
-    <!-- Modal de Edição -->
-    <div id="edit-modal" class="modal">
+      <!-- Escolha do tipo de imagem -->
+      <div class="form-group">
+        <label for="image-type">Tipo de Imagem</label>
+        <select id="image-type" class="form-control">
+          <option value="upload">Upload</option>
+          <option value="url">URL</option>
+        </select>
+      </div>
+
+      <!-- Upload -->
+      <div class="form-group" id="upload-group">
+        <label for="product-image">Imagem (Upload)</label>
+        <input type="file" id="product-image" name="image" class="form-control">
+      </div>
+
+      <!-- URL -->
+      <div class="form-group" id="url-group" style="display: none;">
+        <label for="product-image-url">Imagem (URL)</label>
+        <input type="text" id="product-image-url" name="imageUrl" class="form-control" placeholder="https://...">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Produto -->
+<div id="edit-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal(document.getElementById('edit-modal'))">&times;</span>
+    <h2>Editar Produto</h2>
+    <form id="edit-product-form">
+      <input type="hidden" id="edit-product-id">
+      <div class="form-group">
+        <label for="edit-name">Nome</label>
+        <input type="text" id="edit-name" name="name" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-price">Preço</label>
+        <input type="number" id="edit-price" name="price" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-category">Categoria</label>
+        <select id="edit-category" name="category" class="form-control" required></select>
+      </div>
+      <div class="form-group">
+        <label for="edit-description">Descrição</label>
+        <textarea id="edit-description" name="description" class="form-control"></textarea>
+      </div>
+
+      <!-- Escolha do tipo de imagem -->
+      <div class="form-group">
+        <label for="edit-image-type">Tipo de Imagem</label>
+        <select id="edit-image-type" class="form-control">
+          <option value="upload">Upload</option>
+          <option value="url">URL</option>
+        </select>
+      </div>
+
+      <!-- Upload -->
+      <div class="form-group" id="edit-upload-group">
+        <label for="edit-product-image">Imagem (Upload)</label>
+        <input type="file" id="edit-product-image" name="image" class="form-control">
+      </div>
+
+      <!-- URL -->
+      <div class="form-group" id="edit-url-group" style="display: none;">
+        <label for="edit-product-image-url">Imagem (URL)</label>
+        <input type="text" id="edit-product-image-url" name="imageUrl" class="form-control" placeholder="https://...">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Atualizar</button>
+    </form>
+  </div>
+</div>
+
+
+    <!-- Modal Editar Categoria -->
+    <div id="edit-category-modal" class="modal">
       <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2>Editar Produto</h2>
-        <form id="edit-product-form">
+        <span class="close-btn" onclick="closeModal(document.getElementById('edit-category-modal'))">&times;</span>
+        <h2>Editar Categoria</h2>
+        <form id="edit-category-form">
+          <input type="hidden" id="edit-category-id">
           <div class="form-group">
-            <label for="edit-name">Nome</label>
-            <input type="text" id="edit-name" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="edit-price">Preço (Kz)</label>
-            <input type="number" id="edit-price" class="form-control" min="0" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label for="edit-category">Categoria</label>
-            <select id="edit-category" class="form-control" required></select>
-          </div>
-          <!-- Tipo de imagem -->
-          <div class="form-group">
-            <label for="edit-image-type">Imagem</label>
-            <select id="edit-image-type" class="form-control">
-              <option value="upload">Upload</option>
-              <option value="url">URL</option>
-            </select>
-          </div>
-          <div class="form-group" id="edit-upload-group">
-            <input type="file" id="edit-product-image" class="form-control" accept="image/*">
-          </div>
-          <div class="form-group" id="edit-url-group" style="display:none;">
-            <input type="url" id="edit-product-image-url" class="form-control" placeholder="https://exemplo.com/imagem.jpg">
-          </div>
-          <div class="form-group">
-            <label for="edit-description">Descrição</label>
-            <textarea id="edit-description" class="form-control" required></textarea>
+            <label for="edit-category-name">Nome da Categoria</label>
+            <input type="text" id="edit-category-name" name="name" class="form-control" required>
           </div>
           <button type="submit" class="btn btn-primary">Salvar Alterações</button>
         </form>
@@ -172,7 +196,6 @@
     </div>
   </div>
 
-  <!-- Script principal -->
   <script src="assets/js/menu-admin.js" defer></script>
 </body>
 </html>

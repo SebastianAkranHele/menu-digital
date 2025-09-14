@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * GET /api/categories
- * Lista todas as categorias
+ * Lista todas as categorias → PÚBLICO
  */
 router.get("/", async (req, res) => {
   try {
@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
 
 /**
  * GET /api/categories/:id
- * Obtém uma categoria específica
+ * Obtém uma categoria específica → PÚBLICO
  */
 router.get("/:id", async (req, res) => {
   try {
@@ -40,13 +40,12 @@ router.get("/:id", async (req, res) => {
 
 /**
  * POST /api/categories
- * Cria nova categoria
+ * Cria nova categoria → PROTEGIDO (aplicado no server.js)
  */
 router.post("/", async (req, res) => {
   try {
     const { name } = req.body;
 
-    // Validação
     if (!name || name.trim().length < 2) {
       return res.status(400).json({ error: "Nome é obrigatório e deve ter pelo menos 2 caracteres" });
     }
@@ -56,13 +55,17 @@ router.post("/", async (req, res) => {
 
     res.status(201).json({ id: result.lastID, name: name.trim() });
   } catch (err) {
+    if (err.message.includes("UNIQUE")) {
+      return res.status(400).json({ error: "Categoria já existe" });
+    }
+    console.error(err);
     res.status(500).json({ error: "Erro ao criar categoria" });
   }
 });
 
 /**
  * PUT /api/categories/:id
- * Atualiza categoria
+ * Atualiza categoria → PROTEGIDO
  */
 router.put("/:id", async (req, res) => {
   try {
@@ -82,13 +85,17 @@ router.put("/:id", async (req, res) => {
 
     res.json({ id, name: name.trim() });
   } catch (err) {
+    if (err.message.includes("UNIQUE")) {
+      return res.status(400).json({ error: "Categoria já existe" });
+    }
+    console.error(err);
     res.status(500).json({ error: "Erro ao atualizar categoria" });
   }
 });
 
 /**
  * DELETE /api/categories/:id
- * Remove categoria
+ * Remove categoria → PROTEGIDO
  */
 router.delete("/:id", async (req, res) => {
   try {

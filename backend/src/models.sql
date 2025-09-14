@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL
+   name TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS products (
@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   image TEXT,
   category_id INTEGER,
+   stock INTEGER DEFAULT 0,
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
