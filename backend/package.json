@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+     "frontend": "node frontend-server.js",
     "dev": "nodemon src/server.js",
     "initdb": "node scripts/initDb.js",
     "seed": "node scripts/seedDb.js",

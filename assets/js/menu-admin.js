@@ -1,27 +1,28 @@
-// menu-admin.js — Versão defensiva e consolidada
+// menu-admin.js — Versão consolidada e atualizada
 
 // =======================
 // Configurações iniciais
 // =======================
 const API_BASE = "http://localhost:4000/api";
-
-// Pega o token apenas uma vez
 const token = sessionStorage.getItem("token");
 
 // Proteção segura: redireciona apenas se não houver token
 if (!token) {
-  // Se não estiver logado, manda para login
   window.location.replace("login.html");
   throw new Error("Usuário não logado");
 }
 
+// =======================
 // Estado local
+// =======================
 let selectedFile = null;
 let imageType = "upload";
 let editSelectedFile = null;
 let editProductId = null;
 let editImageType = "upload";
 let editCategoryId = null;
+let editHeroBgFile = null;
+let editHeroLogoFile = null;
 
 // =======================
 // Helpers e utilitários
@@ -35,17 +36,20 @@ function logError(context, err) {
 }
 
 function showAlert(type, title, text, duration = 2000) {
-  // Se duration for passado como 0/false, mostra o botão confirmar
-  Swal.fire({
-    icon: type,
-    title,
-    text,
-    timer: duration || undefined,
-    showConfirmButton: !duration,
-    timerProgressBar: !!duration,
-    background: "#800000",
-    color: "#fff"
-  });
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      icon: type,
+      title,
+      text,
+      timer: duration || undefined,
+      showConfirmButton: !duration,
+      timerProgressBar: !!duration,
+      background: "#800000",
+      color: "#fff"
+    });
+  } else {
+    alert(`${title}: ${text}`);
+  }
 }
 
 // =======================
@@ -127,7 +131,7 @@ function loadImageWithFallback(imgElement, url, alt) {
 }
 
 // =======================
-// Modais (abrir/fechar)
+// Modais
 // =======================
 function openModal(modal) {
   if (!modal) return;
@@ -136,6 +140,145 @@ function openModal(modal) {
 function closeModal(modal) {
   if (!modal) return;
   modal.style.display = "none";
+}
+
+// =======================
+// CRUD PÁGINA INICIAL
+// =======================
+async function loadIndexData() {
+  try {
+    const data = await apiGet("/index");
+    updateIndexPreview(data);
+
+    safeGet("hero-title").value = data.hero_title || "";
+    safeGet("hero-subtitle").value = data.hero_subtitle || "";
+    safeGet("footer-text").value = data.footer_text || "";
+    safeGet("footer-qr").value = data.footer_qr || "";
+    safeGet("buttons-json").value = JSON.stringify(data.buttons || {}, null, 2);
+  } catch (err) {
+    logError("loadIndexData", err);
+    showAlert("error", "Erro", err.message || "Erro ao carregar dados da página inicial");
+  }
+}
+
+function setupIndexForm() {
+  const form = safeGet("index-form");
+  if (!form) return;
+
+  const heroBgInput = safeGet("hero-bg");
+  const heroLogoInput = safeGet("hero-logo");
+  const heroBgPreview = safeGet("hero-bg-preview-form");
+  const heroLogoPreview = safeGet("hero-logo-preview-form");
+
+  if (heroBgInput && heroBgPreview) {
+    heroBgInput.addEventListener("change", e => {
+      editHeroBgFile = e.target.files[0];
+      if (!editHeroBgFile) {
+        heroBgPreview.style.display = "none";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        heroBgPreview.src = ev.target.result;
+        heroBgPreview.style.display = "block";
+      };
+      reader.readAsDataURL(editHeroBgFile);
+    });
+  }
+
+  if (heroLogoInput && heroLogoPreview) {
+    heroLogoInput.addEventListener("change", e => {
+      editHeroLogoFile = e.target.files[0];
+      if (!editHeroLogoFile) {
+        heroLogoPreview.style.display = "none";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        heroLogoPreview.src = ev.target.result;
+        heroLogoPreview.style.display = "block";
+      };
+      reader.readAsDataURL(editHeroLogoFile);
+    });
+  }
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    try {
+      const fd = new FormData();
+      fd.append("hero_title", safeGet("hero-title")?.value || "");
+      fd.append("hero_subtitle", safeGet("hero-subtitle")?.value || "");
+      fd.append("footer_text", safeGet("footer-text")?.value || "");
+      fd.append("footer_qr", safeGet("footer-qr")?.value || "");
+
+      const buttonsEl = safeGet("buttons-json");
+      let buttonsData = {};
+      if (buttonsEl && buttonsEl.value.trim()) {
+        try {
+          buttonsData = JSON.parse(buttonsEl.value);
+        } catch {
+          buttonsData = {};
+        }
+      }
+      fd.append("buttons", JSON.stringify(buttonsData));
+
+      if (editHeroBgFile) fd.append("hero_bg", editHeroBgFile);
+      if (editHeroLogoFile) fd.append("hero_logo", editHeroLogoFile);
+
+      const data = await apiPut("/index", fd);
+      showAlert("success", "Sucesso", "Página inicial atualizada", 1400);
+      updateIndexPreview(data);
+
+      // Voltar ao preview
+      safeGet("index-form").style.display = "none";
+      safeGet("index-preview").style.display = "block";
+    } catch (err) {
+      logError("setupIndexForm submit", err);
+      showAlert("error", "Erro", err.message || "Erro ao atualizar página inicial");
+    }
+  });
+}
+
+function updateIndexPreview(data) {
+  if (!data) return;
+
+  const heroBg = safeGet("hero-bg-preview");
+  if (heroBg && data.hero_bg) {
+    heroBg.src = data.hero_bg + "?t=" + Date.now();
+    heroBg.style.display = "block";
+  } else if (heroBg) {
+    heroBg.style.display = "none";
+  }
+
+  const heroLogo = safeGet("hero-logo-preview");
+  if (heroLogo && data.hero_logo) {
+    heroLogo.src = data.hero_logo + "?t=" + Date.now();
+    heroLogo.style.display = "block";
+  } else if (heroLogo) {
+    heroLogo.style.display = "none";
+  }
+
+  const heroTitle = safeGet("hero-title-preview");
+  if (heroTitle) heroTitle.textContent = data.hero_title || "";
+
+  const heroSubtitle = safeGet("hero-subtitle-preview");
+  if (heroSubtitle) heroSubtitle.textContent = data.hero_subtitle || "";
+
+  const footerText = safeGet("footer-text-preview");
+  if (footerText) footerText.textContent = data.footer_text || "";
+
+  const footerQr = safeGet("footer-qr-preview");
+  if (footerQr) footerQr.textContent = data.footer_qr || "";
+
+  const buttonsPreview = safeGet("buttons-json-preview");
+  if (buttonsPreview) {
+    buttonsPreview.textContent = JSON.stringify(data.buttons || {}, null, 2);
+  }
+}
+
+function enableIndexEditing() {
+  safeGet("index-preview").style.display = "none";
+  safeGet("index-form").style.display = "block";
 }
 
 // =======================
@@ -368,7 +511,8 @@ function openEditProduct(id) {
       } else {
         editImageType = "upload";
         if (elImageType) elImageType.value = "upload";
-        if (elUploadGroup) elUploadGroup.style.display = "block";
+        if (elUploadGroup) elUploadGroup.style.display
+                if (elUploadGroup) elUploadGroup.style.display = "block";
         if (elUrlGroup) elUrlGroup.style.display = "none";
         if (elImageUrl) elImageUrl.value = "";
       }
@@ -385,7 +529,7 @@ function setupEditProductForm() {
   const editForm = safeGet("edit-product-form");
   if (!editForm) return;
 
-  // Remove listeners by cloning
+  // Remove listeners by cloning to avoid duplicates
   const newEditForm = editForm.cloneNode(true);
   editForm.parentNode.replaceChild(newEditForm, editForm);
 
@@ -465,12 +609,26 @@ function previewImage(fileInput, urlInput, previewElement) {
 function setActiveTab(tabName) {
   try {
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => {
+      c.classList.remove("active");
+      c.style.display = "none";
+    });
 
     const tabBtn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
     const tabContent = safeGet(`${tabName}-tab`);
+
     if (tabBtn) tabBtn.classList.add("active");
-    if (tabContent) tabContent.classList.add("active");
+    if (tabContent) {
+      tabContent.classList.add("active");
+      tabContent.style.display = "block";
+    }
+
+    if (tabName === "index") {
+      loadIndexData();
+      // Sempre mostrar preview e esconder form na aba index
+      safeGet("index-preview").style.display = "block";
+      safeGet("index-form").style.display = "none";
+    }
 
     localStorage.setItem("activeTab", tabName);
   } catch (err) {
@@ -637,6 +795,22 @@ function attachListeners() {
   const editUrlInput = safeGet("edit-product-image-url");
   const editPreviewEl = safeGet("edit-product-preview");
   if (editPreviewEl && (editFileInput || editUrlInput)) previewImage(editFileInput, editUrlInput, editPreviewEl);
+
+  // Configurar formulário da página inicial
+  setupIndexForm();
+
+  // Botões para editar e cancelar edição da página inicial
+  const editIndexBtn = safeGet("edit-index-btn");
+  if (editIndexBtn) {
+    editIndexBtn.addEventListener("click", () => enableIndexEditing());
+  }
+  const cancelIndexBtn = safeGet("cancel-edit-index");
+  if (cancelIndexBtn) {
+    cancelIndexBtn.addEventListener("click", () => {
+      safeGet("index-form").style.display = "none";
+      safeGet("index-preview").style.display = "block";
+    });
+  }
 }
 
 // =======================
@@ -644,7 +818,6 @@ function attachListeners() {
 // =======================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // Attach listeners safely
     attachListeners();
 
     // Remove required attributes se não houver elementos
@@ -656,7 +829,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (safeGet("product-category") || safeGet("categories-table")) await loadCategories();
     if (safeGet("products-list")) await loadProducts();
 
-    // Abas
+    // Abas - carregar aba salva ou padrão
     const savedTab = localStorage.getItem("activeTab") || "categories";
     setActiveTab(savedTab);
 

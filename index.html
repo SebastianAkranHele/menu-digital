@@ -3,49 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Garrafeira Das 5 curvas</title>
+  <title>Garrafeira Das 5 Curvas</title>
   <meta name="description" content="Hub digital da garrafeira: acesse menu, WhatsApp, localização e redes sociais num só lugar." />
   <meta name="theme-color" content="#800000" />
   <meta property="og:title" content="Garrafeira — Hub Digital" />
   <meta property="og:description" content="Menu digital, WhatsApp, localização e redes sociais." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="logo.png" />
+  <meta property="og:image" content="/assets/img/magaf1.jpg" />
 
+  <!-- Preload de imagens críticas -->
+  <link rel="preload" href="/assets/img/magaf1.jpg" as="image">
+  
   <!-- Font Awesome -->
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
 
   <!-- CSS externo -->
-  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="stylesheet" href="/assets/css/index.css">
 </head>
 <body>
   <div class="wrap" role="main">
-    <header>
-      <div class="logo" aria-label="Logotipo da garrafeira">
-        <img src="assets/img/magaf1.jpg" alt="Logo" onerror="this.replaceWith(document.createElement('div'))" />
+
+    <!-- Hero Section -->
+    <section class="hero" aria-label="Banner principal">
+      <div class="hero-overlay"></div>
+
+      <!-- Foto de perfil no topo do Hero -->
+      <div class="hero-profile">
+        <div class="logo">
+          <img src="/assets/img/magaf1.jpg" alt="Logo da Garrafeira" id="hero-logo" loading="eager">
+        </div>
       </div>
-      <h1>Garrafeira Das 5 Curvas</h1>
-      <p class="subtitle">O ponto de referência</p>
-    </header>
+    </section>
+
+    <!-- Título e subtítulo abaixo do Hero -->
+    <div class="hero-text">
+      <h1 id="hero-title">Garrafeira Das 5 Curvas</h1>
+      <p id="hero-subtitle">O ponto de referência em vinhos e bebidas</p>
+    </div>
 
     <!-- Links principais -->
-    <div class="buttons" id="links"></div>
+    <nav class="buttons" id="links" aria-label="Links principais"></nav>
 
-    <!-- Destaques (promoções, novidades, top vendas) -->
-    <div class="highlights" id="highlights"></div>
-
+    <!-- Footer -->
     <footer>
-      <div>🍷 Saúde! — Garrafeira Das 5 Curvas</div>
-      <div class="qr-hint">O ponto de referência</div>
+      <div id="footer-text">🍷 Saúde! — Garrafeira Das 5 Curvas</div>
+      <div class="qr-hint" id="footer-qr">O ponto de referência</div>
     </footer>
   </div>
 
   <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- JS externo -->
-  <script src="assets/js/index.js" defer></script>
+  <script src="/assets/js/index.js"></script>
 </body>
 </html>

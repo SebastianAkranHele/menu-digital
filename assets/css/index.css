@@ -1,15 +1,26 @@
+/* ============================= */
+/* Variáveis de cores e estilo */
+/* ============================= */
 :root {
-  --wine:#800000;        /* vinho tinto */
-  --gold:#d4af37;        /* dourado */
-  --ink:#1f2937;         /* cinza escuro */
-  --muted:#6b7280;       /* cinza texto */
-  --bg:#faf7f5;          /* fundo quente */
-  --card:#ffffff;        /* cartão */
+  --wine: #800000;      /* vinho tinto */
+  --gold: #d4af37;      /* dourado */
+  --ink: #1f2937;       /* cinza escuro */
+  --muted: #6b7280;     /* cinza texto */
+  --bg: #faf7f5;        /* fundo quente */
+  --card: #ffffff;      /* cartão */
   --shadow: rgba(0,0,0,.08);
 }
 
+/* ============================= */
+/* Reset e base */
+/* ============================= */
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+}
 
 body {
   background: radial-gradient(1200px 800px at 80% -10%, rgba(212,175,55,.08), transparent),
@@ -22,6 +33,9 @@ body {
   transition: background .3s ease, color .3s ease;
 }
 
+/* ============================= */
+/* Container principal */
+/* ============================= */
 .wrap {
   width: 100%;
   max-width: 440px;
@@ -31,51 +45,103 @@ body {
   transition: box-shadow .3s ease, background .3s ease;
 }
 
-header {
-  display: grid;
-  gap: 10px;
-  place-items: center;
-  padding: 60px 22px 32px;
-  background: linear-gradient(180deg, rgba(128,0,0,.08), transparent 65%);
-  transition: background .3s ease;
+/* ============================= */
+/* Hero Section */
+/* ============================= */
+.hero {
+  position: relative;
+  background: url('../img/magaf1.jpg') no-repeat center center/cover;
+  border-radius: 20px;
+  width: calc(100% - 32px);
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 220px;
 }
 
-.logo {
+/* Overlay escuro sobre a imagem */
+.hero-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 20px;
+  z-index: 1;
+}
+
+/* Foto de perfil no final do Hero */
+.hero-profile {
+  position: absolute;
+  bottom: -55px; /* metade da altura do logo */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.hero-profile .logo {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  background: #fff;
-  display: grid;
-  place-items: center;
   overflow: hidden;
   border: 3px solid var(--gold);
   box-shadow: 0 6px 18px rgba(0,0,0,.1);
+  background: #fff;
+  display: grid;
+  place-items: center;
   transition: transform .3s ease;
 }
-.logo:hover { transform: scale(1.05); }
 
-.logo img {
+.hero-profile .logo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-h1 {
-  margin: 6px 0 0;
-  font-size: 1.6rem;
-  font-weight: 700;
+.hero-profile .logo:hover {
+  transform: scale(1.05);
+}
+
+/* Fallback para imagem quebrada */
+.hero-profile .logo img:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--wine);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-family: 'Font Awesome 6 Free';
+  content: '\f1ad';
+  font-weight: 900;
+  font-size: 2rem;
+}
+
+/* ============================= */
+/* Título e subtítulo abaixo do Hero */
+/* ============================= */
+.hero-text {
+  text-align: center;
+  margin-top: 70px; /* espaço para o logo que flutua */
+  padding: 0 16px;
+}
+
+.hero-text h1 {
+  font-size: 1.8rem;
   color: var(--wine);
-  text-align: center;
-  line-height: 1.3;
+  margin: 0 0 6px;
 }
 
-.subtitle {
-  margin: 0;
+.hero-text p {
+  font-size: 1rem;
   color: var(--muted);
-  font-size: .95rem;
-  text-align: center;
+  margin: 0;
 }
 
+/* ============================= */
+/* Botões de ação */
+/* ============================= */
 .buttons {
   padding: 18px 16px 24px;
   display: grid;
@@ -96,13 +162,24 @@ h1 {
   color: var(--ink);
   box-shadow: 0 2px 0 rgba(0,0,0,.04);
   transition: transform .06s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  cursor: pointer;
 }
+
 .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0,0,0,.08);
 }
-.btn:active { transform: translateY(0); }
 
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Ícone dentro do botão */
 .ico {
   width: 40px;
   height: 40px;
@@ -114,24 +191,26 @@ h1 {
   transition: background .3s ease, color .3s ease;
 }
 
-.badge {
-  justify-self: end;
-  font-size: .75rem;
-  color: #111827;
-  opacity: .5;
-  transition: opacity .3s ease;
+/* Seta no final do botão */
+.btn::after {
+  content: '→';
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
 }
 
-/* cores por tipo */
+.btn:hover::after {
+  opacity: 1;
+}
+
+/* ============================= */
+/* Botões por tipo */
 .is-menu   .ico { background: rgba(128,0,0,.12); color: var(--wine); }
 .is-wa     .ico { background: rgba(37,211,102,.12); color: #25D366; }
-.is-maps   .ico { background: rgba(15,118,110,.12); color: #0F766E; }
 .is-ig     .ico { background: rgba(225,48,108,.12); color: #E1306C; }
 .is-fb     .ico { background: rgba(24,119,242,.12); color: #1877F2; }
-.is-tt     .ico { background: rgba(0,0,0,.12); color: #000; }
-.is-phone  .ico { background: rgba(180,83,9,.12); color: #B45309; }
-.is-site   .ico { background: rgba(212,175,55,.18); color: var(--gold); }
 
+/* ============================= */
+/* Footer */
 footer {
   padding: 10px 16px 18px;
   text-align: center;
@@ -146,21 +225,61 @@ footer {
   text-align: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  body { color: #e5e7eb; background: #0f1115; }
-  .wrap { background: #0f1115; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
-  .btn { background: #151823; border-color: rgba(255,255,255,.06); color: #e5e7eb; }
-  .ico { background: rgba(255,255,255,.06); }
-  header { background: linear-gradient(180deg, rgba(128,0,0,.18), transparent 65%); }
-  .subtitle, footer { color: #9ca3af; }
-  .badge { color: #e5e7eb; opacity: .45; }
+/* ============================= */
+/* Loading state */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
 }
 
-/* Melhorias de responsividade */
+/* ============================= */
+/* Responsividade */
+@media (max-width: 768px) {
+  .hero-text h1 { font-size: 1.6rem; }
+  .hero-text p { font-size: 0.9rem; }
+  
+  body {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 480px) {
-  .wrap { padding: 0; border-radius: 16px; }
+  .wrap { border-radius: 16px; }
   .buttons { padding: 16px; gap: 10px; }
   .btn { padding: 12px; font-size: .95rem; grid-template-columns: 36px 1fr 20px; }
   .ico { width: 36px; height: 36px; font-size: 16px; }
+  
+  .hero {
+    min-height: 180px;
+  }
+  
+  .hero-profile .logo {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .hero-text {
+    margin-top: 50px;
+  }
 }
 
+/* ============================= */
+/* Modo escuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --card: #151823;
+    --ink: #e5e7eb;
+    --muted: #9ca3af;
+    --shadow: rgba(0,0,0,.4);
+  }
+  
+  .btn { 
+    background: #1a1d28; 
+    border-color: rgba(255,255,255,.1);
+  }
+  
+  .ico { 
+    background: rgba(255,255,255,.08); 
+  }
+}

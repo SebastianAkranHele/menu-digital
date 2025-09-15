@@ -1,0 +1,26 @@
+# Nome do site
+title: Garrafeira MAGAF
+description: Menu digital e painel administrativo
+
+# Tema do GitHub Pages (opcional)
+theme: jekyll-theme-primer
+
+# Evitar processar arquivos que não precisam
+exclude:
+  - backend
+  - node_modules
+  - .git
+  - README.md
+  - package.json
+  - package-lock.json
+  - .github
+  - .nojekyll
+
+# Permitir arquivos estáticos adicionais
+include:
+  - assets
+
+# Configurações do Markdown (opcional)
+markdown: kramdown
+kramdown:
+  input: GFM
